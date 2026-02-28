@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { MessagingModule } from '@markethub/messaging';
+import { LoggerModule } from '@markethub/logger';
 import { ProductCatalogController } from './product-catalog.controller';
 import { ProductCatalogService } from './product-catalog.service';
 import { PrismaService } from './prisma.service';
@@ -7,7 +8,7 @@ import { PaymentCompletedListener } from './listeners/payment-completed.listener
 import { OrderCancelledListener } from './listeners/order-cancelled.listener';
 
 @Module({
-  imports: [MessagingModule.forRoot()],
+  imports: [MessagingModule.forRoot(), LoggerModule],
   controllers: [ProductCatalogController],
   providers: [
     PrismaService,

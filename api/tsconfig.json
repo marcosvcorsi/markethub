@@ -28,7 +28,10 @@
       "@markethub/messaging": ["libs/messaging/src"],
       "@markethub/messaging/*": ["libs/messaging/src/*"],
       "@markethub/logger": ["libs/logger/src"],
-      "@markethub/logger/*": ["libs/logger/src/*"]
+      "@markethub/logger/*": ["libs/logger/src/*"],
+      "@prisma/client/product-catalog": ["generated/prisma/product-catalog"],
+      "@prisma/client/order": ["generated/prisma/order"],
+      "@prisma/client/payment": ["generated/prisma/payment"]
     }
   }
 }

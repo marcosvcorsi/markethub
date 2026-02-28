@@ -113,7 +113,10 @@
       "^@markethub/common(|/.*)$": "<rootDir>/libs/common/src/$1",
       "^@markethub/auth(|/.*)$": "<rootDir>/libs/auth/src/$1",
       "^@markethub/messaging(|/.*)$": "<rootDir>/libs/messaging/src/$1",
-      "^@markethub/logger(|/.*)$": "<rootDir>/libs/logger/src/$1"
+      "^@markethub/logger(|/.*)$": "<rootDir>/libs/logger/src/$1",
+      "^@prisma/client/product-catalog$": "<rootDir>/generated/prisma/product-catalog",
+      "^@prisma/client/order$": "<rootDir>/generated/prisma/order",
+      "^@prisma/client/payment$": "<rootDir>/generated/prisma/payment"
     }
   }
 }

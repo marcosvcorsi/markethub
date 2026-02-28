@@ -28,13 +28,13 @@ RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 COPY package*.json ./
 RUN npm ci --omit=dev
 
-# Copy full tsc output (includes apps/ and libs/ subdirectories)
 ARG APP_NAME=gateway
+
+# Copy tsc output (includes apps/<name>/ and libs/ subdirectories)
 COPY --from=builder /app/dist/apps/${APP_NAME} ./dist
 
-# Copy Prisma clients from builder
-COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
-COPY --from=builder /app/node_modules/@prisma/client ./node_modules/@prisma/client
+# Copy generated Prisma clients into dist/ (tsc rewrites path aliases to relative paths)
+COPY --from=builder /app/generated ./dist/generated
 
 # Copy Prisma schema files (needed by init containers for db push)
 COPY --from=builder /app/prisma ./prisma
@@ -43,5 +43,6 @@ USER appuser
 
 EXPOSE 3000
 
+ENV NODE_ENV=production
 ENV APP_NAME=${APP_NAME}
 CMD node dist/apps/${APP_NAME}/src/main.js
