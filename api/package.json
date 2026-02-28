@@ -20,7 +20,8 @@
     "test:e2e": "jest --config ./apps/product-catalog/test/jest-e2e.json && jest --config ./apps/order/test/jest-e2e.json && jest --config ./apps/payment/test/jest-e2e.json",
     "test:e2e:products": "jest --config ./apps/product-catalog/test/jest-e2e.json",
     "test:e2e:orders": "jest --config ./apps/order/test/jest-e2e.json",
-    "test:e2e:payments": "jest --config ./apps/payment/test/jest-e2e.json"
+    "test:e2e:payments": "jest --config ./apps/payment/test/jest-e2e.json",
+    "start:all": "concurrently -n gw,prod,ord,pay,notif -c blue,green,yellow,magenta,cyan \"nest start --watch gateway\" \"nest start --watch product-catalog\" \"nest start --watch order\" \"nest start --watch payment\" \"nest start --watch notification\""
   },
   "dependencies": {
     "@golevelup/nestjs-rabbitmq": "^7.1.2",
@@ -64,6 +65,7 @@
     "@types/passport-jwt": "^4.0.1",
     "@types/supertest": "^6.0.2",
     "@types/uuid": "^10.0.0",
+    "concurrently": "^9.2.1",
     "eslint": "^9.18.0",
     "eslint-config-prettier": "^10.0.1",
     "eslint-plugin-prettier": "^5.2.2",
