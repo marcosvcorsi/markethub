@@ -1,0 +1,27 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../../node_modules/@prisma/client/product-catalog"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("PRODUCT_CATALOG_DATABASE_URL")
+}
+
+model Product {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  description String
+  price       Float
+  stock       Int      @default(0)
+  category    String
+  images      String[]
+  sellerId    String
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([category])
+  @@index([sellerId])
+  @@index([price])
+}

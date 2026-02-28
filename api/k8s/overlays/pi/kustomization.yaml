@@ -1,0 +1,91 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../../base
+
+patches:
+  # Use NodePort for web on Pi
+  - target:
+      kind: Service
+      name: web
+    patch: |
+      - op: replace
+        path: /spec/type
+        value: NodePort
+      - op: add
+        path: /spec/ports/0/nodePort
+        value: 30080
+
+  # Use NodePort for gateway on Pi
+  - target:
+      kind: Service
+      name: gateway
+    patch: |
+      - op: replace
+        path: /spec/type
+        value: NodePort
+      - op: add
+        path: /spec/ports/0/nodePort
+        value: 30000
+
+  # Tight resource limits for Raspberry Pi 4 (8GB RAM)
+  - target:
+      kind: Deployment
+    patch: |
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/requests/cpu
+        value: 50m
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/requests/memory
+        value: 64Mi
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits/cpu
+        value: 200m
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits/memory
+        value: 128Mi
+
+  - target:
+      kind: StatefulSet
+    patch: |
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/requests/cpu
+        value: 50m
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/requests/memory
+        value: 64Mi
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits/cpu
+        value: 250m
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits/memory
+        value: 256Mi
+
+  # Reduce PVC sizes for Pi
+  - target:
+      kind: StatefulSet
+    patch: |
+      - op: replace
+        path: /spec/volumeClaimTemplates/0/spec/resources/requests/storage
+        value: 512Mi
+
+images:
+  - name: markethub/gateway
+    newName: markethub/gateway
+    newTag: latest
+  - name: markethub/product-catalog
+    newName: markethub/product-catalog
+    newTag: latest
+  - name: markethub/order
+    newName: markethub/order
+    newTag: latest
+  - name: markethub/payment
+    newName: markethub/payment
+    newTag: latest
+  - name: markethub/notification
+    newName: markethub/notification
+    newTag: latest
+  - name: markethub/web
+    newName: markethub/web
+    newTag: latest

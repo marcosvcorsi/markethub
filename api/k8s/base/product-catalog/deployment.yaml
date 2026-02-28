@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: product-catalog
+  namespace: markethub
+  labels:
+    app: product-catalog
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: product-catalog
+  template:
+    metadata:
+      labels:
+        app: product-catalog
+    spec:
+      initContainers:
+        - name: prisma-push
+          image: markethub/product-catalog:latest
+          command: ["sh", "-c", "npx prisma db push --schema=prisma/product-catalog/schema.prisma --skip-generate --accept-data-loss"]
+          envFrom:
+            - configMapRef:
+                name: markethub-config
+      containers:
+        - name: product-catalog
+          image: markethub/product-catalog:latest
+          ports:
+            - containerPort: 3001
+          envFrom:
+            - configMapRef:
+                name: markethub-config
+          env:
+            - name: PORT
+              value: "3001"
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
+          readinessProbe:
+            tcpSocket:
+              port: 3001
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: 3001
+            initialDelaySeconds: 30
+            periodSeconds: 15

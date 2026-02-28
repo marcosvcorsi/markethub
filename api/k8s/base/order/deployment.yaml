@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order
+  namespace: markethub
+  labels:
+    app: order
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: order
+  template:
+    metadata:
+      labels:
+        app: order
+    spec:
+      initContainers:
+        - name: prisma-push
+          image: markethub/order:latest
+          command: ["sh", "-c", "npx prisma db push --schema=prisma/order/schema.prisma --skip-generate --accept-data-loss"]
+          envFrom:
+            - configMapRef:
+                name: markethub-config
+      containers:
+        - name: order
+          image: markethub/order:latest
+          ports:
+            - containerPort: 3002
+          envFrom:
+            - configMapRef:
+                name: markethub-config
+          env:
+            - name: PORT
+              value: "3002"
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
+          readinessProbe:
+            tcpSocket:
+              port: 3002
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: 3002
+            initialDelaySeconds: 30
+            periodSeconds: 15

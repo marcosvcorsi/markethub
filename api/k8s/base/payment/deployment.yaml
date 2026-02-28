@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payment
+  namespace: markethub
+  labels:
+    app: payment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: payment
+  template:
+    metadata:
+      labels:
+        app: payment
+    spec:
+      initContainers:
+        - name: prisma-push
+          image: markethub/payment:latest
+          command: ["sh", "-c", "npx prisma db push --schema=prisma/payment/schema.prisma --skip-generate --accept-data-loss"]
+          envFrom:
+            - configMapRef:
+                name: markethub-config
+      containers:
+        - name: payment
+          image: markethub/payment:latest
+          ports:
+            - containerPort: 3003
+          envFrom:
+            - configMapRef:
+                name: markethub-config
+          env:
+            - name: PORT
+              value: "3003"
+            - name: STRIPE_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: markethub-secrets
+                  key: STRIPE_SECRET_KEY
+            - name: STRIPE_WEBHOOK_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: markethub-secrets
+                  key: STRIPE_WEBHOOK_SECRET
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
+          readinessProbe:
+            tcpSocket:
+              port: 3003
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: 3003
+            initialDelaySeconds: 30
+            periodSeconds: 15

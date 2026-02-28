@@ -1,0 +1,85 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../../base
+
+patches:
+  # Use NodePort for web in minikube (access frontend)
+  - target:
+      kind: Service
+      name: web
+    patch: |
+      - op: replace
+        path: /spec/type
+        value: NodePort
+      - op: add
+        path: /spec/ports/0/nodePort
+        value: 30080
+
+  # Use NodePort for gateway in minikube (access API)
+  - target:
+      kind: Service
+      name: gateway
+    patch: |
+      - op: replace
+        path: /spec/type
+        value: NodePort
+      - op: add
+        path: /spec/ports/0/nodePort
+        value: 30000
+
+  # Use NodePort for Keycloak in minikube
+  - target:
+      kind: Service
+      name: keycloak
+    patch: |
+      - op: replace
+        path: /spec/type
+        value: NodePort
+      - op: add
+        path: /spec/ports/0/nodePort
+        value: 30880
+
+  # Use NodePort for Grafana in minikube
+  - target:
+      kind: Service
+      name: grafana
+    patch: |
+      - op: replace
+        path: /spec/type
+        value: NodePort
+      - op: add
+        path: /spec/ports/0/nodePort
+        value: 30030
+
+  # Lower resource limits for local development
+  - target:
+      kind: Deployment
+    patch: |
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits/cpu
+        value: 250m
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits/memory
+        value: 192Mi
+
+images:
+  - name: markethub/gateway
+    newName: markethub/gateway
+    newTag: latest
+  - name: markethub/product-catalog
+    newName: markethub/product-catalog
+    newTag: latest
+  - name: markethub/order
+    newName: markethub/order
+    newTag: latest
+  - name: markethub/payment
+    newName: markethub/payment
+    newTag: latest
+  - name: markethub/notification
+    newName: markethub/notification
+    newTag: latest
+  - name: markethub/web
+    newName: markethub/web
+    newTag: latest

@@ -1,0 +1,19 @@
+{
+  "moduleFileExtensions": ["js", "json", "ts"],
+  "rootDir": ".",
+  "testEnvironment": "node",
+  "testRegex": ".e2e-spec.ts$",
+  "transform": {
+    "^.+\\.(t|j)s$": "ts-jest"
+  },
+  "transformIgnorePatterns": [
+    "node_modules/(?!(jose)/)"
+  ],
+  "moduleNameMapper": {
+    "^@markethub/common(|/.*)$": "<rootDir>/../../../libs/common/src/$1",
+    "^@markethub/auth(|/.*)$": "<rootDir>/../../../libs/auth/src/$1",
+    "^@markethub/messaging(|/.*)$": "<rootDir>/../../../libs/messaging/src/$1",
+    "^@markethub/logger(|/.*)$": "<rootDir>/../../../libs/logger/src/$1",
+    "^@prisma/client/order$": "<rootDir>/../../../node_modules/@prisma/client/order"
+  }
+}

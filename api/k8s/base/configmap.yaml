@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: markethub-config
+  namespace: markethub
+data:
+  KEYCLOAK_URL: "http://keycloak:8080"
+  KEYCLOAK_REALM: "markethub"
+  KEYCLOAK_CLIENT_ID: "markethub-api"
+  RABBITMQ_URI: "amqp://markethub:markethub@rabbitmq:5672"
+  PRODUCT_CATALOG_URL: "http://product-catalog:3001"
+  ORDER_SERVICE_URL: "http://order:3002"
+  PAYMENT_SERVICE_URL: "http://payment:3003"
+  NOTIFICATION_SERVICE_URL: "http://notification:3004"
+  PRODUCT_CATALOG_DATABASE_URL: "mongodb://markethub:markethub@mongodb:27017/product_catalog?authSource=admin&directConnection=true"
+  ORDER_DATABASE_URL: "postgresql://markethub:markethub@postgres-order:5432/orders"
+  PAYMENT_DATABASE_URL: "postgresql://markethub:markethub@postgres-payment:5432/payments"
