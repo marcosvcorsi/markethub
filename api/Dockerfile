@@ -13,9 +13,9 @@ COPY . .
 ARG APP_NAME=gateway
 
 # Generate Prisma clients BEFORE build (code imports from @prisma/client/*)
-RUN if [ -d "prisma/product-catalog" ]; then npx prisma generate --schema=prisma/product-catalog/schema.prisma; fi
-RUN if [ -d "prisma/order" ]; then npx prisma generate --schema=prisma/order/schema.prisma; fi
-RUN if [ -d "prisma/payment" ]; then npx prisma generate --schema=prisma/payment/schema.prisma; fi
+RUN npx prisma generate --schema=prisma/product-catalog/schema.prisma && \
+    npx prisma generate --schema=prisma/order/schema.prisma && \
+    npx prisma generate --schema=prisma/payment/schema.prisma
 
 RUN npx nest build ${APP_NAME}
 
@@ -28,7 +28,7 @@ RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 COPY package*.json ./
 RUN npm ci --omit=dev
 
-# Copy built application
+# Copy full tsc output (includes apps/ and libs/ subdirectories)
 ARG APP_NAME=gateway
 COPY --from=builder /app/dist/apps/${APP_NAME} ./dist
 
@@ -43,4 +43,5 @@ USER appuser
 
 EXPOSE 3000
 
-CMD ["node", "dist/main.js"]
+ENV APP_NAME=${APP_NAME}
+CMD node dist/apps/${APP_NAME}/src/main.js
