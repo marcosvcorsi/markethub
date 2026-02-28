@@ -1,0 +1,273 @@
+services:
+  # --- Databases ---
+  mongodb:
+    image: mongo:7
+    entrypoint: /etc/mongo/rs-init.sh
+    ports:
+      - '27017:27017'
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER:-markethub}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD:-markethub}
+      MONGO_INITDB_DATABASE: product_catalog
+    volumes:
+      - mongodb_data:/data/db
+      - ./api/infra/mongo/rs-init.sh:/etc/mongo/rs-init.sh:ro
+    healthcheck:
+      test: >-
+        mongosh -u markethub -p markethub --authenticationDatabase admin
+        --eval "try { rs.status().ok } catch(e) { rs.initiate({_id:'rs0',members:[{_id:0,host:'localhost:27017'}]}).ok }"
+        --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  postgres-order:
+    image: postgres:16-alpine
+    ports:
+      - '5433:5432'
+    environment:
+      POSTGRES_USER: ${ORDER_DB_USER:-markethub}
+      POSTGRES_PASSWORD: ${ORDER_DB_PASSWORD:-markethub}
+      POSTGRES_DB: orders
+    volumes:
+      - postgres_order_data:/var/lib/postgresql/data
+    healthcheck:
+      test: pg_isready -U ${ORDER_DB_USER:-markethub} -d orders
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  postgres-payment:
+    image: postgres:16-alpine
+    ports:
+      - '5434:5432'
+    environment:
+      POSTGRES_USER: ${PAYMENT_DB_USER:-markethub}
+      POSTGRES_PASSWORD: ${PAYMENT_DB_PASSWORD:-markethub}
+      POSTGRES_DB: payments
+    volumes:
+      - postgres_payment_data:/var/lib/postgresql/data
+    healthcheck:
+      test: pg_isready -U ${PAYMENT_DB_USER:-markethub} -d payments
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: redis-cli ping
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # --- Message Broker ---
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    ports:
+      - '5672:5672'
+      - '15672:15672'
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-markethub}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:-markethub}
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # --- Identity ---
+  keycloak-db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${KEYCLOAK_DB_USER:-keycloak}
+      POSTGRES_PASSWORD: ${KEYCLOAK_DB_PASSWORD:-keycloak}
+      POSTGRES_DB: keycloak
+    volumes:
+      - keycloak_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: pg_isready -U ${KEYCLOAK_DB_USER:-keycloak} -d keycloak
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:24.0
+    command: start-dev --import-realm
+    ports:
+      - '8080:8080'
+    environment:
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://keycloak-db:5432/keycloak
+      KC_DB_USERNAME: ${KEYCLOAK_DB_USER:-keycloak}
+      KC_DB_PASSWORD: ${KEYCLOAK_DB_PASSWORD:-keycloak}
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN:-admin}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:-admin}
+    volumes:
+      - ./api/infra/keycloak:/opt/keycloak/data/import
+    depends_on:
+      keycloak-db:
+        condition: service_healthy
+
+  # --- Logging ---
+  loki:
+    image: grafana/loki:2.9.0
+    ports:
+      - '3100:3100'
+    command: -config.file=/etc/loki/local-config.yaml
+
+  grafana:
+    image: grafana/grafana:10.0.0
+    ports:
+      - '3050:3000'
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-admin}
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./api/infra/grafana/provisioning:/etc/grafana/provisioning
+    depends_on:
+      - loki
+
+  # --- Backend Services ---
+  gateway:
+    build:
+      context: ./api
+      args:
+        APP_NAME: gateway
+    ports:
+      - '3000:3000'
+    environment:
+      PORT: 3000
+      PRODUCT_CATALOG_URL: http://product-catalog:3001
+      ORDER_SERVICE_URL: http://order:3002
+      PAYMENT_SERVICE_URL: http://payment:3003
+      NOTIFICATION_SERVICE_URL: http://notification:3004
+      KEYCLOAK_URL: http://keycloak:8080
+      KEYCLOAK_REALM: markethub
+      KEYCLOAK_CLIENT_ID: markethub-api
+      CORS_ORIGIN: http://localhost:8000
+    depends_on:
+      keycloak:
+        condition: service_started
+      product-catalog:
+        condition: service_started
+      order:
+        condition: service_started
+      payment:
+        condition: service_started
+      notification:
+        condition: service_started
+
+  product-catalog:
+    build:
+      context: ./api
+      args:
+        APP_NAME: product-catalog
+    ports:
+      - '3001:3001'
+    environment:
+      PORT: 3001
+      PRODUCT_CATALOG_DATABASE_URL: mongodb://markethub:markethub@mongodb:27017/product_catalog?authSource=admin
+      RABBITMQ_URI: amqp://markethub:markethub@rabbitmq:5672
+      KEYCLOAK_URL: http://keycloak:8080
+      KEYCLOAK_REALM: markethub
+      KEYCLOAK_CLIENT_ID: markethub-api
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+  order:
+    build:
+      context: ./api
+      args:
+        APP_NAME: order
+    ports:
+      - '3002:3002'
+    environment:
+      PORT: 3002
+      ORDER_DATABASE_URL: postgresql://markethub:markethub@postgres-order:5432/orders
+      RABBITMQ_URI: amqp://markethub:markethub@rabbitmq:5672
+      KEYCLOAK_URL: http://keycloak:8080
+      KEYCLOAK_REALM: markethub
+      KEYCLOAK_CLIENT_ID: markethub-api
+    depends_on:
+      postgres-order:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+  payment:
+    build:
+      context: ./api
+      args:
+        APP_NAME: payment
+    ports:
+      - '3003:3003'
+    environment:
+      PORT: 3003
+      PAYMENT_DATABASE_URL: postgresql://markethub:markethub@postgres-payment:5432/payments
+      RABBITMQ_URI: amqp://markethub:markethub@rabbitmq:5672
+      KEYCLOAK_URL: http://keycloak:8080
+      KEYCLOAK_REALM: markethub
+      KEYCLOAK_CLIENT_ID: markethub-api
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-sk_test_placeholder}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-whsec_placeholder}
+    depends_on:
+      postgres-payment:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+  notification:
+    build:
+      context: ./api
+      args:
+        APP_NAME: notification
+    ports:
+      - '3004:3004'
+    environment:
+      PORT: 3004
+      RABBITMQ_URI: amqp://markethub:markethub@rabbitmq:5672
+      KEYCLOAK_URL: http://keycloak:8080
+      KEYCLOAK_REALM: markethub
+      KEYCLOAK_CLIENT_ID: markethub-api
+      RESEND_API_KEY: ${RESEND_API_KEY:-re_placeholder}
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+
+  # --- Frontend ---
+  web:
+    build:
+      context: ./web
+    ports:
+      - '8000:3000'
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:3000
+      NEXT_PUBLIC_WS_URL: ws://localhost:3004
+      AUTH_SECRET: change-me-in-production
+      AUTH_KEYCLOAK_ID: markethub-web
+      AUTH_KEYCLOAK_SECRET: ""
+      AUTH_KEYCLOAK_ISSUER: http://keycloak:8080/realms/markethub
+      AUTH_TRUST_HOST: "true"
+    depends_on:
+      gateway:
+        condition: service_started
+
+volumes:
+  mongodb_data:
+  postgres_order_data:
+  postgres_payment_data:
+  redis_data:
+  rabbitmq_data:
+  keycloak_db_data:
+  grafana_data:
