@@ -14,7 +14,7 @@ export class MessagingModule {
     return {
       module: MessagingModule,
       imports: [
-        RabbitMQModule.forRoot(RabbitMQModule, {
+        RabbitMQModule.forRoot({
           uri,
           exchanges: [
             {

@@ -15,7 +15,8 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { CurrentUser, UserContext } from '@markethub/common';
+import { CurrentUser } from '@markethub/common';
+import type { UserContext } from '@markethub/common';
 import { OrderService } from './order.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { OrderQueryDto } from './dto/order-query.dto';

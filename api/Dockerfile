@@ -11,12 +11,13 @@ RUN npm ci
 COPY . .
 
 ARG APP_NAME=gateway
-RUN npx nest build ${APP_NAME}
 
-# Generate Prisma clients if schema files exist
+# Generate Prisma clients BEFORE build (code imports from @prisma/client/*)
 RUN if [ -d "prisma/product-catalog" ]; then npx prisma generate --schema=prisma/product-catalog/schema.prisma; fi
 RUN if [ -d "prisma/order" ]; then npx prisma generate --schema=prisma/order/schema.prisma; fi
 RUN if [ -d "prisma/payment" ]; then npx prisma generate --schema=prisma/payment/schema.prisma; fi
+
+RUN npx nest build ${APP_NAME}
 
 # --- Production stage ---
 FROM node:20-alpine AS production

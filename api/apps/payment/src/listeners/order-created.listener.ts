@@ -1,7 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { RabbitSubscribe } from '@golevelup/nestjs-rabbitmq';
 import { PaymentStatus } from '@prisma/client/payment';
-import { DomainEvent, Events } from '@markethub/common';
+import { Events } from '@markethub/common';
+import type { DomainEvent } from '@markethub/common';
 import { MARKETHUB_EXCHANGE, EventPublisherService } from '@markethub/messaging';
 import { PrismaService } from '../prisma.service';
 

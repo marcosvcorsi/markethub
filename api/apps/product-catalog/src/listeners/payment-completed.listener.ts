@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { RabbitSubscribe } from '@golevelup/nestjs-rabbitmq';
-import { DomainEvent, Events } from '@markethub/common';
+import { Events } from '@markethub/common';
+import type { DomainEvent } from '@markethub/common';
 import { MARKETHUB_EXCHANGE } from '@markethub/messaging';
 import { ProductCatalogService } from '../product-catalog.service';
 
