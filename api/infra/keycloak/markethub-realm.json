@@ -51,11 +51,13 @@
       "directAccessGrantsEnabled": true,
       "redirectUris": [
         "http://localhost:3000/*",
-        "http://localhost:3001/*"
+        "http://localhost:3001/*",
+        "http://localhost:8000/*"
       ],
       "webOrigins": [
         "http://localhost:3000",
-        "http://localhost:3001"
+        "http://localhost:3001",
+        "http://localhost:8000" 
       ],
       "protocol": "openid-connect",
       "defaultClientScopes": [

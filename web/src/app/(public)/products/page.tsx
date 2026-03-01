@@ -27,7 +27,7 @@ export default async function ProductsPage(props: {
   let result: PaginatedResponse<Product>;
   try {
     result = await serverFetch<PaginatedResponse<Product>>(
-      `/products/products?${query.toString()}`,
+      `/products?${query.toString()}`,
     );
   } catch {
     result = { data: [], meta: { page: 1, limit: 20, total: 0, totalPages: 0 } };
