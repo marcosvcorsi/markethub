@@ -27,6 +27,24 @@ export class GatewayController {
     };
   }
 
+  // Handle /products and /products/:id routes (must come before :service/*path)
+  @All('products/:id')
+  @Public()
+  async productsById(
+    @Param('id') id: string,
+    @Req() req: Request,
+    @Res() res: Response,
+  ) {
+    return this.proxyToService('products', `/products/${id}`, req, res);
+  }
+
+  @All('products')
+  @Public()
+  async productsList(@Req() req: Request, @Res() res: Response) {
+    return this.proxyToService('products', '/products', req, res);
+  }
+
+  // Generic service proxy (catches unmatched routes)
   @All(':service/*path')
   @Public()
   async proxy(
@@ -64,23 +82,6 @@ export class GatewayController {
       };
       res.status(status).json(data);
     }
-  }
-
-  // Handle /products and /products/:id routes
-  @All('products')
-  @Public()
-  async productsList(@Req() req: Request, @Res() res: Response) {
-    return this.proxyToService('products', '/products', req, res);
-  }
-
-  @All('products/:id')
-  @Public()
-  async productsById(
-    @Param('id') id: string,
-    @Req() req: Request,
-    @Res() res: Response,
-  ) {
-    return this.proxyToService('products', `/products/${id}`, req, res);
   }
 
   private async proxyToService(

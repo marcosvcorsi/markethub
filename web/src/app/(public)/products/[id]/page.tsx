@@ -15,7 +15,7 @@ interface Props {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
   try {
-    const product = await serverFetch<Product>(`/products/products/${id}`);
+    const product = await serverFetch<Product>(`/products/${id}`);
     return {
       title: `${product.name} | MarketHub`,
       description: product.description.slice(0, 160),
@@ -30,7 +30,7 @@ export default async function ProductDetailPage({ params }: Props) {
 
   let product: Product;
   try {
-    product = await serverFetch<Product>(`/products/products/${id}`);
+    product = await serverFetch<Product>(`/products/${id}`);
   } catch {
     notFound();
   }
