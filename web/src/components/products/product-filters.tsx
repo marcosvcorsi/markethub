@@ -27,10 +27,10 @@ const CATEGORIES = [
 ];
 
 const SORT_OPTIONS: { value: ProductSortBy; label: string }[] = [
-  { value: "NEWEST", label: "Newest" },
-  { value: "PRICE_ASC", label: "Price: Low to High" },
-  { value: "PRICE_DESC", label: "Price: High to Low" },
-  { value: "NAME", label: "Name" },
+  { value: "newest", label: "Newest" },
+  { value: "price_asc", label: "Price: Low to High" },
+  { value: "price_desc", label: "Price: High to Low" },
+  { value: "name", label: "Name" },
 ];
 
 export function ProductFilters() {

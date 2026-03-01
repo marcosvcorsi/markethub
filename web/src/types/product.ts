@@ -12,7 +12,7 @@ export interface Product {
   updatedAt: string;
 }
 
-export type ProductSortBy = "PRICE_ASC" | "PRICE_DESC" | "NEWEST" | "NAME";
+export type ProductSortBy = "newest" | "price_asc" | "price_desc" | "name";
 
 export interface ProductQuery {
   page?: number;
