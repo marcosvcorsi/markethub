@@ -17,7 +17,7 @@ export function useCreateOrder() {
   const { data: session } = useSession();
   return useMutation({
     mutationFn: (items: CreateOrderItem[]) =>
-      clientFetch<Order>("/orders/orders", session?.accessToken, {
+      clientFetch<Order>("/orders", session?.accessToken, {
         method: "POST",
         body: JSON.stringify({ items }),
       }),
@@ -33,7 +33,7 @@ export function useCreateCheckout() {
       cancelUrl: string;
     }) =>
       clientFetch<CheckoutResponse>(
-        "/payments/payments/checkout",
+        "/payments/checkout",
         session?.accessToken,
         {
           method: "POST",

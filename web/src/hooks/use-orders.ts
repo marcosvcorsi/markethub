@@ -15,7 +15,7 @@ export function useOrders(params?: { status?: OrderStatus; page?: number }) {
       if (params?.status) query.set("status", params.status);
       if (params?.page) query.set("page", String(params.page));
       return clientFetch<PaginatedResponse<Order>>(
-        `/orders/orders?${query.toString()}`,
+        `/orders?${query.toString()}`,
         session?.accessToken,
       );
     },
@@ -28,7 +28,7 @@ export function useOrder(id: string) {
   return useQuery({
     queryKey: ["orders", id],
     queryFn: () =>
-      clientFetch<Order>(`/orders/orders/${id}`, session?.accessToken),
+      clientFetch<Order>(`/orders/${id}`, session?.accessToken),
     enabled: !!session?.accessToken && !!id,
   });
 }
@@ -38,7 +38,7 @@ export function useCancelOrder() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (orderId: string) =>
-      clientFetch(`/orders/orders/${orderId}/cancel`, session?.accessToken, {
+      clientFetch(`/orders/${orderId}/cancel`, session?.accessToken, {
         method: "POST",
       }),
     onSuccess: (_, orderId) => {

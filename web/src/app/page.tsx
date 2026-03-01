@@ -10,7 +10,7 @@ export default async function HomePage() {
   let featured: Product[] = [];
   try {
     const result = await serverFetch<PaginatedResponse<Product>>(
-      "/products/products?sortBy=NEWEST&limit=8",
+      "/products?sortBy=newest&limit=8",
     );
     featured = result.data;
   } catch {

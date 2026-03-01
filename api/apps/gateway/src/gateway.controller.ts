@@ -44,6 +44,56 @@ export class GatewayController {
     return this.proxyToService('products', '/products', req, res);
   }
 
+  // Handle /orders routes
+  @All('orders')
+  @Public()
+  async orders(@Req() req: Request, @Res() res: Response) {
+    return this.proxyToService('order', '/orders', req, res);
+  }
+
+  @All('orders/:id')
+  @Public()
+  async ordersById(
+    @Param('id') id: string,
+    @Req() req: Request,
+    @Res() res: Response,
+  ) {
+    return this.proxyToService('order', `/orders/${id}`, req, res);
+  }
+
+  @All('orders/:id/cancel')
+  @Public()
+  async ordersCancel(
+    @Param('id') id: string,
+    @Req() req: Request,
+    @Res() res: Response,
+  ) {
+    return this.proxyToService('order', `/orders/${id}/cancel`, req, res);
+  }
+
+  // Handle /payments routes
+  @All('payments/checkout')
+  @Public()
+  async paymentsCheckout(@Req() req: Request, @Res() res: Response) {
+    return this.proxyToService('payment', '/payments/checkout', req, res);
+  }
+
+  @All('payments/order/:orderId')
+  @Public()
+  async paymentsByOrderId(
+    @Param('orderId') orderId: string,
+    @Req() req: Request,
+    @Res() res: Response,
+  ) {
+    return this.proxyToService('payment', `/payments/order/${orderId}`, req, res);
+  }
+
+  @All('payments/webhook')
+  @Public()
+  async paymentsWebhook(@Req() req: Request, @Res() res: Response) {
+    return this.proxyToService('payment', '/payments/webhook', req, res);
+  }
+
   // Generic service proxy (catches unmatched routes)
   @All(':service/*path')
   @Public()
