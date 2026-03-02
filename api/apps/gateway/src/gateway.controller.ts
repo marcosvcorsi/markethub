@@ -48,7 +48,7 @@ export class GatewayController {
   @All('orders')
   @Public()
   async orders(@Req() req: Request, @Res() res: Response) {
-    return this.proxyToService('order', '/orders', req, res);
+    return this.proxyToService('orders', '/orders', req, res);
   }
 
   @All('orders/:id')
@@ -58,7 +58,7 @@ export class GatewayController {
     @Req() req: Request,
     @Res() res: Response,
   ) {
-    return this.proxyToService('order', `/orders/${id}`, req, res);
+    return this.proxyToService('orders', `/orders/${id}`, req, res);
   }
 
   @All('orders/:id/cancel')
@@ -68,14 +68,14 @@ export class GatewayController {
     @Req() req: Request,
     @Res() res: Response,
   ) {
-    return this.proxyToService('order', `/orders/${id}/cancel`, req, res);
+    return this.proxyToService('orders', `/orders/${id}/cancel`, req, res);
   }
 
   // Handle /payments routes
   @All('payments/checkout')
   @Public()
   async paymentsCheckout(@Req() req: Request, @Res() res: Response) {
-    return this.proxyToService('payment', '/payments/checkout', req, res);
+    return this.proxyToService('payments', '/payments/checkout', req, res);
   }
 
   @All('payments/order/:orderId')
@@ -85,13 +85,13 @@ export class GatewayController {
     @Req() req: Request,
     @Res() res: Response,
   ) {
-    return this.proxyToService('payment', `/payments/order/${orderId}`, req, res);
+    return this.proxyToService('payments', `/payments/order/${orderId}`, req, res);
   }
 
   @All('payments/webhook')
   @Public()
   async paymentsWebhook(@Req() req: Request, @Res() res: Response) {
-    return this.proxyToService('payment', '/payments/webhook', req, res);
+    return this.proxyToService('payments', '/payments/webhook', req, res);
   }
 
   // Generic service proxy (catches unmatched routes)

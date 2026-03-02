@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { MessagingModule } from '@markethub/messaging';
 import { LoggerModule } from '@markethub/logger';
+import { AuthModule } from '@markethub/auth';
 import { PaymentController } from './payment.controller';
 import { PaymentService } from './payment.service';
 import { PrismaService } from './prisma.service';
@@ -8,7 +9,7 @@ import { StripeService } from './stripe.service';
 import { OrderCreatedListener } from './listeners/order-created.listener';
 
 @Module({
-  imports: [MessagingModule.forRoot(), LoggerModule],
+  imports: [MessagingModule.forRoot(), LoggerModule, AuthModule],
   controllers: [PaymentController],
   providers: [
     PrismaService,
