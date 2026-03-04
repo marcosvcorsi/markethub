@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { HttpModule } from '@nestjs/axios';
 import { MessagingModule } from '@markethub/messaging';
 import { LoggerModule } from '@markethub/logger';
 import { AuthModule } from '@markethub/auth';
@@ -9,7 +10,15 @@ import { StripeService } from './stripe.service';
 import { OrderCreatedListener } from './listeners/order-created.listener';
 
 @Module({
-  imports: [MessagingModule.forRoot(), LoggerModule, AuthModule],
+  imports: [
+    MessagingModule.forRoot(),
+    LoggerModule,
+    AuthModule,
+    HttpModule.register({
+      timeout: 5000,
+      maxRedirects: 5,
+    }),
+  ],
   controllers: [PaymentController],
   providers: [
     PrismaService,
