@@ -14,7 +14,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      audience: process.env.KEYCLOAK_CLIENT_ID || 'markethub-api',
       issuer: `${keycloakUrl}/realms/${realm}`,
       algorithms: ['RS256'],
       secretOrKeyProvider: passportJwtSecret({

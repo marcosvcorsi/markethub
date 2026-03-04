@@ -149,7 +149,7 @@ services:
       ORDER_SERVICE_URL: http://order:3002
       PAYMENT_SERVICE_URL: http://payment:3003
       NOTIFICATION_SERVICE_URL: http://notification:3004
-      KEYCLOAK_URL: http://keycloak:8080
+      KEYCLOAK_URL: http://host.docker.internal:8080
       KEYCLOAK_REALM: markethub
       KEYCLOAK_CLIENT_ID: markethub-api
       CORS_ORIGIN: http://localhost:3000
@@ -196,7 +196,7 @@ services:
       PORT: 3002
       ORDER_DATABASE_URL: postgresql://markethub:markethub@postgres-order:5432/orders
       RABBITMQ_URI: amqp://markethub:markethub@rabbitmq:5672
-      KEYCLOAK_URL: http://keycloak:8080
+      KEYCLOAK_URL: http://host.docker.internal:8080
       KEYCLOAK_REALM: markethub
       KEYCLOAK_CLIENT_ID: markethub-api
     depends_on:
@@ -216,7 +216,7 @@ services:
       PORT: 3003
       PAYMENT_DATABASE_URL: postgresql://markethub:markethub@postgres-payment:5432/payments
       RABBITMQ_URI: amqp://markethub:markethub@rabbitmq:5672
-      KEYCLOAK_URL: http://keycloak:8080
+      KEYCLOAK_URL: http://host.docker.internal:8080
       KEYCLOAK_REALM: markethub
       KEYCLOAK_CLIENT_ID: markethub-api
       STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-sk_test_placeholder}
