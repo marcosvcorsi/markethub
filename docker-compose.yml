@@ -143,6 +143,8 @@ services:
         APP_NAME: gateway
     ports:
       - '3000:3000'
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     environment:
       PORT: 3000
       PRODUCT_CATALOG_URL: http://product-catalog:3001
@@ -172,11 +174,13 @@ services:
         APP_NAME: product-catalog
     ports:
       - '3001:3001'
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     environment:
       PORT: 3001
       PRODUCT_CATALOG_DATABASE_URL: mongodb://markethub:markethub@mongodb:27017/product_catalog?authSource=admin
       RABBITMQ_URI: amqp://markethub:markethub@rabbitmq:5672
-      KEYCLOAK_URL: http://keycloak:8080
+      KEYCLOAK_URL: http://host.docker.internal:8080
       KEYCLOAK_REALM: markethub
       KEYCLOAK_CLIENT_ID: markethub-api
     depends_on:
@@ -192,6 +196,8 @@ services:
         APP_NAME: order
     ports:
       - '3002:3002'
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     environment:
       PORT: 3002
       ORDER_DATABASE_URL: postgresql://markethub:markethub@postgres-order:5432/orders
@@ -212,6 +218,8 @@ services:
         APP_NAME: payment
     ports:
       - '3003:3003'
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     environment:
       PORT: 3003
       PAYMENT_DATABASE_URL: postgresql://markethub:markethub@postgres-payment:5432/payments
@@ -234,10 +242,12 @@ services:
         APP_NAME: notification
     ports:
       - '3004:3004'
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     environment:
       PORT: 3004
       RABBITMQ_URI: amqp://markethub:markethub@rabbitmq:5672
-      KEYCLOAK_URL: http://keycloak:8080
+      KEYCLOAK_URL: http://host.docker.internal:8080
       KEYCLOAK_REALM: markethub
       KEYCLOAK_CLIENT_ID: markethub-api
       RESEND_API_KEY: ${RESEND_API_KEY:-re_placeholder}

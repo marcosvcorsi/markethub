@@ -7,6 +7,7 @@ import {
   Param,
   Post,
   Query,
+  UnauthorizedException,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -36,6 +37,9 @@ export class OrderController {
     @Body() dto: CreateOrderDto,
     @CurrentUser() user: UserContext,
   ) {
+    if (!user?.sub) {
+      throw new UnauthorizedException('User not authenticated');
+    }
     return this.orderService.create(dto, user.sub);
   }
 
@@ -46,6 +50,9 @@ export class OrderController {
     @Query() query: OrderQueryDto,
     @CurrentUser() user: UserContext,
   ) {
+    if (!user?.sub) {
+      throw new UnauthorizedException('User not authenticated');
+    }
     return this.orderService.findAll(query, user.sub);
   }
 
@@ -58,6 +65,9 @@ export class OrderController {
     @Param('id') id: string,
     @CurrentUser() user: UserContext,
   ) {
+    if (!user?.sub) {
+      throw new UnauthorizedException('User not authenticated');
+    }
     return this.orderService.findById(id, user.sub);
   }
 
@@ -72,6 +82,9 @@ export class OrderController {
     @Param('id') id: string,
     @CurrentUser() user: UserContext,
   ) {
+    if (!user?.sub) {
+      throw new UnauthorizedException('User not authenticated');
+    }
     return this.orderService.cancel(id, user.sub);
   }
 }
