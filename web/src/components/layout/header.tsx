@@ -21,25 +21,28 @@ export function Header() {
   const { data: session } = useSession();
 
   return (
-    <header className="bg-background sticky top-0 z-50 border-b">
+    <header className="sticky top-0 z-50 border-b border-indigo-100 bg-white/80 backdrop-blur-md dark:border-white/10 dark:bg-slate-900/80">
       <div className="container mx-auto flex h-16 items-center gap-4 px-4">
         <MobileNav />
 
-        <Link href={Routes.HOME} className="flex items-center gap-2">
-          <ShoppingBag className="text-primary h-6 w-6" />
-          <span className="text-xl font-bold hidden sm:inline">MarketHub</span>
+        <Link href={Routes.HOME} className="flex items-center gap-2 shrink-0">
+          <ShoppingBag className="h-6 w-6 text-indigo-600" />
+          <span className="hidden bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-xl font-bold text-transparent sm:inline">
+            MarketHub
+          </span>
         </Link>
 
         <nav className="hidden items-center gap-6 md:flex">
           <Link
             href={Routes.PRODUCTS}
-            className="text-muted-foreground hover:text-foreground text-sm transition-colors"
+            className="group relative text-sm text-muted-foreground transition-colors hover:text-indigo-600"
           >
             Products
+            <span className="absolute -bottom-0.5 left-0 h-0.5 w-0 rounded-full bg-indigo-600 transition-all duration-200 group-hover:w-full" />
           </Link>
         </nav>
 
-        <div className="flex-1 hidden sm:flex justify-center">
+        <div className="hidden flex-1 justify-center sm:flex">
           <Suspense>
             <SearchBar />
           </Suspense>
@@ -74,7 +77,7 @@ export function Header() {
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <Button asChild variant="outline" size="sm">
+            <Button asChild size="sm">
               <Link href={Routes.SIGN_IN}>Sign In</Link>
             </Button>
           )}
