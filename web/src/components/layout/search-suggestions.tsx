@@ -57,7 +57,7 @@ export function SearchSuggestions({
       {/* Footer */}
       <button
         onClick={onSearchAll}
-        className="flex w-full items-center justify-between border-t border-slate-100 px-4 py-2.5 text-sm text-indigo-600 transition-colors hover:bg-indigo-50 dark:border-white/10 dark:text-indigo-400 dark:hover:bg-indigo-950"
+        className="flex w-full cursor-pointer items-center justify-between border-t border-slate-100 px-4 py-2.5 text-sm text-indigo-600 transition-colors hover:bg-indigo-50 dark:border-white/10 dark:text-indigo-400 dark:hover:bg-indigo-950"
       >
         <span>Search all results for &ldquo;{query}&rdquo;</span>
         <ArrowRight className="h-4 w-4" />

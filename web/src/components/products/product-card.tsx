@@ -78,7 +78,7 @@ export function ProductCard({ product }: ProductCardProps) {
           ) : (
             <button
               onClick={handleAddToCart}
-              className="hidden items-center gap-1.5 rounded-lg border border-indigo-200 bg-indigo-50 px-3 py-1.5 text-xs font-medium text-indigo-700 opacity-0 transition-all duration-200 hover:bg-indigo-100 group-hover:opacity-100 sm:flex dark:border-indigo-800 dark:bg-indigo-950 dark:text-indigo-300 dark:hover:bg-indigo-900"
+              className="hidden cursor-pointer items-center gap-1.5 rounded-lg border border-indigo-200 bg-indigo-50 px-3 py-1.5 text-xs font-medium text-indigo-700 opacity-0 transition-all duration-200 hover:bg-indigo-100 group-hover:opacity-100 sm:flex dark:border-indigo-800 dark:bg-indigo-950 dark:text-indigo-300 dark:hover:bg-indigo-900"
             >
               <ShoppingCart className="h-3.5 w-3.5" />
               Add
